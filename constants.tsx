@@ -258,6 +258,60 @@ export const MOCK_MENTORS: Mentor[] = [
     origin: 'Nigeria',
     scholarship: 'Opportunity Fund',
     imageUrl: 'https://picsum.photos/seed/amina/200/200'
+  },
+  {
+    id: 'm3',
+    name: 'Chioma Adebayo',
+    university: 'Stanford University',
+    major: 'Artificial Intelligence',
+    origin: 'Nigeria',
+    scholarship: 'Mastercard Foundation',
+    imageUrl: 'https://picsum.photos/seed/chioma/200/200'
+  },
+  {
+    id: 'm4',
+    name: 'Samuel Mwangi',
+    university: 'Harvard University',
+    major: 'Economics & Policy',
+    origin: 'Kenya',
+    scholarship: 'Rhodes Scholar',
+    imageUrl: 'https://picsum.photos/seed/samuel/200/200'
+  },
+  {
+    id: 'm5',
+    name: 'Thabo Mbeki',
+    university: 'ETH Zurich',
+    major: 'Mechanical Engineering',
+    origin: 'South Africa',
+    scholarship: 'Swiss Excellence',
+    imageUrl: 'https://picsum.photos/seed/thabo/200/200'
+  },
+  {
+    id: 'm6',
+    name: 'Fatima Zahra',
+    university: 'MIT',
+    major: 'Quantum Physics',
+    origin: 'Morocco',
+    scholarship: 'Gates Millennium',
+    imageUrl: 'https://picsum.photos/seed/fatima/200/200'
+  },
+  {
+    id: 'm7',
+    name: 'Jean-Paul Bakare',
+    university: 'Princeton University',
+    major: 'Architecture',
+    origin: 'Rwanda',
+    scholarship: 'Ashinaga Africa',
+    imageUrl: 'https://picsum.photos/seed/jeanpaul/200/200'
+  },
+  {
+    id: 'm8',
+    name: 'Zainab Al-Fayed',
+    university: 'University of Oxford',
+    major: 'Philosophy & Politics',
+    origin: 'Egypt',
+    scholarship: 'Oxford Weidenfeld',
+    imageUrl: 'https://picsum.photos/seed/zainab/200/200'
   }
 ];
 
