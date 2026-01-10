@@ -270,6 +270,60 @@ export const MOCK_NETWORKS: Network[] = [
     description: 'One of the largest student-governed organizations based in the US, supporting black engineers through leadership and technical training.',
     url: 'https://www.nsbe.org',
     iconType: 'tech'
+  },
+  {
+    id: 'n2',
+    name: 'SEO Africa (Sponsors for Educational Opportunity)',
+    category: 'Professional',
+    focus: ['Investment Banking', 'Consulting', 'Private Equity'],
+    description: 'Connects high-achieving African students with world-class internship and full-time opportunities in global financial hubs.',
+    url: 'https://www.seo-africa.org',
+    iconType: 'business'
+  },
+  {
+    id: 'n3',
+    name: 'Black in AI',
+    category: 'Professional',
+    focus: ['Artificial Intelligence', 'Machine Learning', 'Research'],
+    description: 'A multi-institutional initiative for black researchers in AI. Provides travel grants, mentorship, and a global database of researchers.',
+    url: 'https://blackinai.github.io',
+    iconType: 'tech'
+  },
+  {
+    id: 'n4',
+    name: 'African Leadership Network (ALN)',
+    category: 'Professional',
+    focus: ['Leadership', 'Entrepreneurship', 'Venture Capital'],
+    description: 'A community of dynamic African leaders committed to creating prosperity in Africa. Exclusive access to leadership summits and investment circles.',
+    url: 'https://www.africanleadershipnetwork.com',
+    iconType: 'business'
+  },
+  {
+    id: 'n5',
+    name: 'Lawyers Without Borders (African Chapters)',
+    category: 'Professional',
+    focus: ['Rule of Law', 'Human Rights', 'International Law'],
+    description: 'Engages legal professionals from across the continent in pro-bono work and international legal development projects.',
+    url: 'https://www.lwob.org',
+    iconType: 'law'
+  },
+  {
+    id: 'n6',
+    name: 'Rhodes Trust Alumni Association',
+    category: 'Alumni',
+    focus: ['Global Impact', 'Research', 'Public Policy'],
+    description: 'The global alumni network of Rhodes Scholars. A lifelong community of over 5,000 scholars working in various sectors globally.',
+    url: 'https://www.rhodeshouse.ox.ac.uk',
+    iconType: 'general'
+  },
+  {
+    id: 'n7',
+    name: 'Mastercard Foundation Alumni Network',
+    category: 'Alumni',
+    focus: ['Social Impact', 'Community Development', 'Higher Education'],
+    description: 'A network for former Mastercard Foundation scholars to collaborate on projects that drive transformation across the African continent.',
+    url: 'https://mastercardfdn.org',
+    iconType: 'general'
   }
 ];
 
