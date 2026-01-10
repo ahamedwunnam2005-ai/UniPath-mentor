@@ -1,0 +1,9 @@
+{
+  "name": "UniPath Mentor",
+  "description": "An intelligent AI-powered application mentor for international students applying to European and North American universities, featuring document review, progress tracking, and personalized guidance.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
