@@ -19,18 +19,52 @@ import { supabaseService, supabase } from './services/supabaseService';
 
 export type SyncStatus = 'idle' | 'syncing' | 'saved' | 'error';
 
+// Demo mode check - shows app without authentication on GitHub Pages
+const isDemoMode = () => {
+  return import.meta.env.MODE === 'production' && !window.location.hostname.includes('localhost');
+};
+
+const DEMO_USER: UserProfile = {
+  id: 'demo-user',
+  name: 'Sarah Chen',
+  email: 'sarah@example.com',
+  country: 'Singapore',
+  gpa: '3.95',
+  satScore: '1550',
+  targetMajor: 'Computer Science',
+  avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+  role: 'student',
+  engagementStatus: 'engaged',
+  financialAidNeeded: true,
+  bio: 'Passionate about AI and international education',
+  testScores: { toefl: '115', ielts: '', det: '135' }
+};
+
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(isDemoMode());
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.DASHBOARD);
   const [isGeneratingRoadmap, setIsGeneratingRoadmap] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   
-  const [steps, setSteps] = useState<ApplicationStep[]>([]);
-  const [universities, setUniversities] = useState<University[]>([]); 
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [steps, setSteps] = useState<ApplicationStep[]>(isDemoMode() ? INITIAL_STEPS : []);
+  const [universities, setUniversities] = useState<University[]>(isDemoMode() ? MOCK_UNIVERSITIES.slice(0, 5) : []); 
+  const [applications, setApplications] = useState<Application[]>(isDemoMode() ? [
+    {
+      id: 'app-1',
+      universityId: MOCK_UNIVERSITIES[0].id,
+      status: 'Submitted',
+      appliedDate: new Date().toISOString()
+    },
+    {
+      id: 'app-2',
+      universityId: MOCK_UNIVERSITIES[1].id,
+      status: 'Under Review',
+      appliedDate: new Date().toISOString()
+    }
+  ] : []);
 
-  const [user, setUser] = useState<UserProfile>({
+  const [user, setUser] = useState<UserProfile>(isDemoMode() ? DEMO_USER : {
     id: '',
     name: '',
     email: '',
@@ -49,6 +83,9 @@ const App: React.FC = () => {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   useEffect(() => {
+    // Skip auth setup in demo mode
+    if (isDemoMode()) return;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         setIsAuthenticated(true);
@@ -100,7 +137,9 @@ const App: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    await supabaseService.signOut();
+    if (!isDemoMode()) {
+      await supabaseService.signOut();
+    }
     setIsAuthenticated(false);
   };
 
@@ -116,6 +155,19 @@ const App: React.FC = () => {
   };
 
   const handleProfileUpdate = async (updatedUser: UserProfile) => {
+    if (isDemoMode()) {
+      setUser(updatedUser);
+      setNotifications(prev => [{
+        id: `profile-sync-${Date.now()}`,
+        title: 'Demo Mode',
+        message: `Changes are not persisted in demo mode. Sign in to save your profile.`,
+        type: 'system',
+        timestamp: new Date(),
+        isRead: false
+      }, ...prev]);
+      return;
+    }
+
     setSyncStatus('syncing');
     setUser(updatedUser);
     
@@ -146,16 +198,18 @@ const App: React.FC = () => {
     setIsGeneratingRoadmap(true);
     setSyncStatus('syncing');
     try {
-      const generatedSteps = await geminiService.generateRoadmap(user);
+      const generatedSteps = isDemoMode() ? INITIAL_STEPS : await geminiService.generateRoadmap(user);
       const updatedUser: UserProfile = { ...user, engagementStatus: 'engaged' };
       setUser(updatedUser);
       const finalSteps = generatedSteps.length > 0 ? generatedSteps : INITIAL_STEPS;
       setSteps(finalSteps);
       
-      await Promise.all([
-        supabaseService.syncProfile(updatedUser),
-        supabaseService.syncRoadmap(user.id!, finalSteps)
-      ]);
+      if (!isDemoMode()) {
+        await Promise.all([
+          supabaseService.syncProfile(updatedUser),
+          supabaseService.syncRoadmap(user.id!, finalSteps)
+        ]);
+      }
 
       setSyncStatus('saved');
       setLastSaved(new Date());
@@ -180,7 +234,9 @@ const App: React.FC = () => {
     });
     setSteps(nextSteps);
     try {
-      await supabaseService.syncRoadmap(user.id!, nextSteps);
+      if (!isDemoMode()) {
+        await supabaseService.syncRoadmap(user.id!, nextSteps);
+      }
       setSyncStatus('saved');
       setLastSaved(new Date());
     } catch (e: any) {
@@ -195,7 +251,9 @@ const App: React.FC = () => {
     const nextApps = applications.map(app => app.id === appId ? { ...app, status } : app);
     setApplications(nextApps);
     try {
-      await supabaseService.syncApplications(user.id!, nextApps);
+      if (!isDemoMode()) {
+        await supabaseService.syncApplications(user.id!, nextApps);
+      }
       setSyncStatus('saved');
       setLastSaved(new Date());
     } catch (e: any) {
@@ -210,7 +268,9 @@ const App: React.FC = () => {
     const nextApps = applications.filter(app => app.id !== appId);
     setApplications(nextApps);
     try {
-      await supabaseService.syncApplications(user.id!, nextApps);
+      if (!isDemoMode()) {
+        await supabaseService.syncApplications(user.id!, nextApps);
+      }
       setSyncStatus('saved');
       setLastSaved(new Date());
     } catch (e: any) {
@@ -241,7 +301,9 @@ const App: React.FC = () => {
     if (!universities.some(u => u.id === uni.id)) setUniversities(prev => [...prev, uni]);
     
     try {
-      await supabaseService.syncApplications(user.id!, nextApps);
+      if (!isDemoMode()) {
+        await supabaseService.syncApplications(user.id!, nextApps);
+      }
       setSyncStatus('saved');
       setLastSaved(new Date());
     } catch (e: any) {
@@ -277,15 +339,16 @@ const App: React.FC = () => {
           </h1>
           <p className="text-slate-500 font-bold text-sm md:text-base max-w-2xl leading-relaxed">
             International admissions ecosystem. All sessions are cloud-persistent.
+            {isDemoMode() && <span className="text-amber-600 ml-2">(Demo Mode - Sign in to save)</span>}
           </p>
         </div>
       </div>
 
-      {activeTab === AppTab.DASHBOARD && <Dashboard user={user} onUpdateUser={handleProfileUpdate} onEngage={handleEngage} steps={steps} universities={universities} scholarships={MOCK_SCHOLARSHIPS} isGeneratingRoadmap={isGeneratingRoadmap} onToggleStep={handleToggleStep} />}
-      {activeTab === AppTab.STATUS && <ApplicationStatus applications={applications} universities={[...MOCK_UNIVERSITIES, ...universities]} onUpdateStatus={updateApplicationStatus} onRemove={removeApplication} onExplore={() => setActiveTab(AppTab.UNI_FINDER)} />}
+      {activeTab === AppTab.DASHBOARD && <Dashboard user={user} onUpdateUser={handleProfileUpdate} onEngage={handleEngage} steps={steps} universities={universities} scholarships={MOCK_SCHOLARSHIPS} isGeneratingRoadmap={isGeneratingRoadmap} />}
+      {activeTab === AppTab.STATUS && <ApplicationStatus applications={applications} universities={[...MOCK_UNIVERSITIES, ...universities]} onUpdateStatus={updateApplicationStatus} onRemove={removeApplication} />}
       {activeTab === AppTab.PROFILE && <Profile user={user} onUpdateUser={handleProfileUpdate} lastSaved={lastSaved} syncStatus={syncStatus} />}
       {activeTab === AppTab.UNI_FINDER && <UniFinder onTrack={addApplication} trackingIds={applications.map(a => a.universityId)} />}
-      {activeTab === AppTab.SMART_MATCH && <SmartMatch onTrack={addApplication} trackingIds={applications.map(a => a.universityId)} initialProfile={{ name: user.name, country: user.country, level: 'Undergraduate', field: user.targetMajor, gpa: user.gpa }} />}
+      {activeTab === AppTab.SMART_MATCH && <SmartMatch onTrack={addApplication} trackingIds={applications.map(a => a.universityId)} initialProfile={{ name: user.name, country: user.country, level: 'undergraduate' }} />}
       {activeTab === AppTab.SCHOLARSHIPS && <Scholarships />}
       {activeTab === AppTab.ELITE_NETWORK && <EliteNetwork user={user} />}
       {activeTab === AppTab.DOCUMENT_MENTOR && <DocumentMentor />}
